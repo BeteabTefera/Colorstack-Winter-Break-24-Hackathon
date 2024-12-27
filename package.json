@@ -1,0 +1,8 @@
+{
+	"name": "winterbreak-24-hackathon",
+	"version": "0.0.1",
+	"main": "index.js",
+	"repository": "https://github.com/BeteabTefera/Winter-Break-24-Hackathon.git",
+	"author": "wflore19 <wflore19@montgomerycollege.edu>",
+	"license": "MIT"
+}
