@@ -1,8 +1,20 @@
 {
 	"name": "winterbreak-24-hackathon",
 	"version": "0.0.1",
-	"main": "index.js",
 	"repository": "https://github.com/BeteabTefera/Winter-Break-24-Hackathon.git",
 	"author": "wflore19 <wflore19@montgomerycollege.edu>",
-	"license": "MIT"
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch api/src/index.ts"
+	},
+	"dependencies": {
+		"@hono/node-server": "^1.13.7",
+		"hono": "^4.6.14"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.17",
+		"tsx": "^4.7.1"
+	},
+	"packageManager": "yarn@1.22.22"
 }
