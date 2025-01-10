@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+'use client'
+import { useEffect, useState } from 'react'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { Geist, Geist_Mono } from "next/font/google";
-import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,25 +14,34 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Colorstack API Dashboard",
-  description: "API Dashboard for Colorstack",
-};
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  if (!hasMounted) {
+    return null
+  }
+
+  return <>{children}</>
+}
+
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </body>
+      <ClientOnly>
+        <body>
+          <AuthProvider>{children}</AuthProvider>
+        </body>
+      </ClientOnly>
     </html>
-  );
+  )
 }
+

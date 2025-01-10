@@ -1,11 +1,12 @@
+import React from 'react'
 import PrivateRoute from '@/components/PrivateRoute'
-import Dashboard from '../../components/Dashboard';
+import ApiDocs from '@/components/ApiDocs'
 
-export default function DashboardPage() {
+export default function ApiDocsPage() {
   return (
     <PrivateRoute>
       <div>
-        <Dashboard />
+        <ApiDocs />
       </div>
     </PrivateRoute>
   )

@@ -1,19 +1,23 @@
 "use client";
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext'
 
-const PrivateRoute: React.FC<{ component: React.ComponentType<any> }> = ({ component: Component }) => {
-  const { user } = useAuth();
-  const router = useRouter();
+export default function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
-    if (!user) {
-      router.push('/');
+    if (!loading && !user) {
+      router.push('/')
     }
-  }, [user, router]);
+  }, [user, loading, router])
 
-  return user ? <Component /> : null;
-};
+  // Show loading state while checking auth
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
-export default PrivateRoute;
+  // Only render children if user is authenticated
+  return user ? <>{children}</> : null
+}
