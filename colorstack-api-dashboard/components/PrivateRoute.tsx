@@ -1,12 +1,19 @@
 "use client";
-import React from 'react';
-import { Navigate, RouteProps } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 
-const PrivateRoute: React.FC<RouteProps & { component: React.ComponentType<any> }> = ({ component: Component, ...rest }) => {
+const PrivateRoute: React.FC<{ component: React.ComponentType<any> }> = ({ component: Component }) => {
   const { user } = useAuth();
+  const router = useRouter();
 
-  return user ? <Component {...rest as any} /> : <Navigate to="/" replace />;
+  useEffect(() => {
+    if (!user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
+  return user ? <Component /> : null;
 };
 
 export default PrivateRoute;

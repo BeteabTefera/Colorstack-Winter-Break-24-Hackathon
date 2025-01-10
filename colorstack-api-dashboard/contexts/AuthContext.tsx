@@ -25,6 +25,8 @@ interface AuthContextType {
   supabase: any; // You might want to use a more specific type from @supabase/supabase-js
   checkAndActivateUser: (email: string) => Promise<boolean>;
   signIn: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  loading: boolean;
   fetchStudentData: (email: string) => Promise<Student>;
   studentData: Student | null;
 }
@@ -34,12 +36,13 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [studentData, setStudentData] = useState<Student | null>(null);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        window.location.href = '/dashboard';
-      }
+      setUser(session?.user || null);
+      setLoading(false);
     });
   
     return () => {
@@ -97,17 +100,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const signIn = async (email: string, redirectTo?: string) => {
+  const signIn = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({ 
       email,
       options: {
-        emailRedirectTo: redirectTo || `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`
+        emailRedirectTo:`${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`
+        
       }
     });
+    console.log(process.env.NEXT_PUBLIC_BASE_URL);
     if (error) throw error;
   };
   
-  
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    // Additional cleanup if needed
+  };
   
   const fetchStudentData = async (email:string) => {
     try {
@@ -128,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
   
   return (
-    <AuthContext.Provider value={{ user, supabase, checkAndActivateUser, signIn, fetchStudentData, studentData }}>
+    <AuthContext.Provider value={{ user, loading, supabase, checkAndActivateUser, signIn, signOut, fetchStudentData, studentData }}>
       {children}
     </AuthContext.Provider>
   );

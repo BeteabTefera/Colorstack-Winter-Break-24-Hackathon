@@ -24,7 +24,7 @@ const LandingPage: React.FC = () => {
     e.preventDefault();
     try {
       const studentData = await fetchStudentData(email);
-      await signIn(email, `${BASE_URL}/dashboard`);
+      await signIn(email);
       alert(`Welcome back, ${studentData.first_name}! Check your email for the login link.`);
     } catch (error: any) {
       if (error.message === 'Student not found in Colorstack database') {
