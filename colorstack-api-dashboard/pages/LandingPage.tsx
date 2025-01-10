@@ -19,7 +19,6 @@ const LandingPage: React.FC = () => {
     }
   };
   
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const handleSignIn = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
