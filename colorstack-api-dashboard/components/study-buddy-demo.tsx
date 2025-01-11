@@ -41,7 +41,7 @@ const StudyBuddyDemo: React.FC = () => {
         <div className="max-w-4xl w-full space-y-8">
           <div className="bg-white p-8 rounded-xl shadow-2xl">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">Showcase: Study Buddy API Capabilities</h1>
-            <p className="text-xl text-gray-600 mb-8">Here's what you can build using our Study Buddy API endpoint!</p>
+            <p className="text-xl text-gray-600 mb-8">Here is what you can build using our Study Buddy API endpoint!</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-teal-50 p-6 rounded-lg shadow">

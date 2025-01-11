@@ -46,7 +46,7 @@ const ApiDocs: React.FC = () => {
                 <Book className="text-teal-600 mr-2" />
                 <h2 className="text-2xl font-semibold text-gray-800">Getting Started</h2>
               </div>
-              <p className="text-gray-600">To use the ColorStack API, you'll need to authenticate using your API key. You can find your API key in the Dashboard.</p>
+              <p className="text-gray-600">To use the ColorStack API, you will need to authenticate using your API key. You can find your API key in the Dashboard.</p>
             </section>
 
             <section className="mb-8">

@@ -15,28 +15,36 @@ const LandingPage: React.FC = () => {
       const studentData = await fetchStudentData(email);
       alert(`Account activated successfully for ${studentData.first_name} ${studentData.last_name}! Check your email for the activation link.`);
       await signIn(email);
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('An unexpected error occurred. Please try again.');
+      }
     }
   };
-
+  
   const handleSignIn = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
       const studentData = await fetchStudentData(email);
-      
+  
       if (!studentData.activated_at) {
         alert('Your account is not activated. Please activate your account first.');
         return;
       }
-      
+  
       await signIn(email);
       alert(`Welcome, ${studentData.first_name}! Check your email for the login link.`);
-    } catch (error: any) {
-      if (error.message === 'Student not found in Colorstack database') {
-        alert('Sorry, we couldn\'t find your account. Please check your email or contact support.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if (error.message === 'Student not found in Colorstack database') {
+          alert('Sorry, we couldn\'t find your account. Please check your email or contact support.');
+        } else {
+          alert('An error occurred. Please try again later.');
+        }
       } else {
-        alert('An error occurred. Please try again later.');
+        alert('An unexpected error occurred. Please try again.');
       }
     }
   };
