@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { HeartHandshake } from 'lucide-react';
@@ -28,15 +28,8 @@ const Dashboard: React.FC = () => {
   const studentsPerPage = 10;
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      fetchStudents();
-      fetchApiUsage();
-      fetchCurrentUser();
-    }
-  }, [user]);
-
-  const fetchCurrentUser = async () => {
+  // Memoizing the functions using useCallback
+  const fetchCurrentUser = useCallback(async () => {
     if (user?.email) {
       const { data, error } = await supabase
         .from('students')
@@ -46,17 +39,17 @@ const Dashboard: React.FC = () => {
       if (error) console.error('Error fetching current user:', error);
       else setCurrentUser(data);
     }
-  };
+  }, [user?.email, supabase]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     const { data, error } = await supabase
       .from('students')
       .select('id, email, first_name, last_name, activated_at');
     if (error) console.error('Error fetching students:', error);
     else setStudents(data || []);
-  };
+  }, [supabase]);
 
-  const fetchApiUsage = async () => {
+  const fetchApiUsage = useCallback(async () => {
     const { data, error } = await supabase
       .from('api_usage')
       .select('email, total_requests, last_request_at')
@@ -64,7 +57,15 @@ const Dashboard: React.FC = () => {
       .single();
     if (error) console.error('Error fetching API usage:', error);
     else setApiUsage(data);
-  };
+  }, [user?.email, supabase]);
+
+  useEffect(() => {
+    if (user) {
+      fetchStudents();
+      fetchApiUsage();
+      fetchCurrentUser();
+    }
+  }, [user, fetchStudents, fetchApiUsage, fetchCurrentUser]);
 
   const handleSignOut = async () => {
     await signOut();

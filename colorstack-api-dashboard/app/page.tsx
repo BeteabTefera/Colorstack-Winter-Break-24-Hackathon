@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { HandHeart, Github } from "lucide-react";
 import Link from "next/link";
+import Image from 'next/image';
 
 const LandingPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -53,7 +54,7 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-500 to-sage-600 px-4 py-12">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <img className="h-12 w-auto mx-auto mb-6" src="/assets/logo.png" alt="ColorStack" />
+        <Image src="/assets/logo.png" alt="ColorStack" width={200} height={200} />
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">API Dashboard</h2>
         <p className="text-center text-gray-600 mb-8">Enter your ColorStack email to activate or sign in</p>
         <form className="space-y-6">
