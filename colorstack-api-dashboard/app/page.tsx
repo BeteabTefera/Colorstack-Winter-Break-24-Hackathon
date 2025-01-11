@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { HandHeart } from "lucide-react";
+import { Github } from "lucide-react";
+import Link from "next/link";
 
 const LandingPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -36,10 +39,15 @@ const LandingPage: React.FC = () => {
   
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:px-12 lg:py-14">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-         ColorStack API
+        <img
+          className="h-12 w-auto mx-auto"
+          src="./assets/logo.png"
+          alt="ColorStack"
+        />
+        <h2 className="p-2 text-3xl font-bold text-center text-gray-800 mb-8">
+         API-Dashboard
         </h2>
         <p className="text-center text-gray-600 mb-8">
           Enter your ColorStack email to activate or sign in to your account
@@ -75,6 +83,15 @@ const LandingPage: React.FC = () => {
               Sign In
             </button>
           </div>
+          <div className="flex justify-center space-x-4">
+            <HandHeart size={32} />
+            <Link href="https://github.com/BeteabTefera/Winter-Break-24-Hackathon" target="_blank">
+              <Github size={32} />
+            </Link>
+          </div>
+          <p className=" p-3 text-center text-gray-600 mb-8">
+            By Stackers for Stackers 
+          </p>
         </form>
       </div>
     </div>
