@@ -155,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { error } = await supabase.auth.signInWithOtp({ 
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_URL || 'https://api-dashboard-hyxtbxvgm-elceeds-projects.vercel.app'}/dashboard`,
         data: {
           email
         }
