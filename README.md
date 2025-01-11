@@ -30,8 +30,12 @@ Key Components:
    - Student Management: Features a table displaying student information with options for searching and filtering based on activation status. This section allows users to easily navigate through student records.
    - Responsive Navigation: Includes a navigation bar that works seamlessly on both desktop and mobile devices, providing quick access to different sections of the dashboard.
 
-**We are having issue deploying the dashboard to Vercel so here is the functionality and UI from local host
-**## Colorstack-API-Dashboard UI Overview
+**We are having issue deploying the dashboard to Vercel so here is the functionality and UI from local host**
+# Oyster Integration Plan
+- We hope to make this go as big as possible! if this gets implemented in the future here is a design for quick integration within **Oyster** :) 
+  ![image](https://github.com/user-attachments/assets/16bc3e18-5909-4ba8-a8d5-fb14337c4aee)
+_Design made by Karachi Onwuanibe_
+## Colorstack-API-Dashboard UI Overview
 ## landing Page
 - Utilizing Supabase Auth , only colorstack memebers in the Oyster DB can get in by activating their account and they get magic link
 ![image](https://github.com/user-attachments/assets/ee01066f-c27f-41c4-a834-da3a6b23feba)
