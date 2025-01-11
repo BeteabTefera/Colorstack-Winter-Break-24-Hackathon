@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, Suspense} from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -201,7 +201,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       fetchStudentData, 
       studentData 
     }}>
-      {children}
+      <Suspense fallback={<div>Loading...</div>}>
+        {children}
+      </Suspense>
     </AuthContext.Provider>
   );
 };
