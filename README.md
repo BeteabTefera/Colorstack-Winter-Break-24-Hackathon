@@ -1,8 +1,19 @@
-# Oyster-API
+# Colorstack-API
 
-Welcome to the **Oyster-API** repository!
+Welcome to the **Colorstack-API** repository!
 
-This project was created for the **Colorstack Winter-Break Hackathon**. The goal of this project is to **TBD**
+This project was created for the **Colorstack Winter-Break Hackathon**. The goal of this project is simple. Lets break it down
+
+## Problem
+- 90% of Color Stack Members are CS & SWE Students
+- ColorStack has oyster but issues are being limited
+
+## Solution
+- We have created Colorstack-API
+  ![image](https://github.com/user-attachments/assets/2d6998e4-77f8-4232-8067-a5be5a05fc8c)
+- 
+
+
 
 ## Repository Structure
 
