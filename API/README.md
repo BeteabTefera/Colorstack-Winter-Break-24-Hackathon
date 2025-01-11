@@ -1,4 +1,4 @@
-This is a **express API** project utilizing supabase database for now since we are emulating the tabels that oyster have. In the future we hope that this feature gets integrated with oyster DB.
+This is a **express API** project utilizing supabase database for now since we are emulating the tabels that oyster have. In the future we hope that this feature gets **integrated with oyster DB.**
 
 ## Pre-Request
 - Make sure you have your **.env** setup, by setting up your Supabase Project. Reach out to beteabtefera@gmail.com to get added to the project to get access. 
