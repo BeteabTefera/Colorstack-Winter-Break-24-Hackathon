@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const supabase = require('./supabaseClient');
+const supabase = require('../supabaseClient');
 
 const app = express();
 const PORT = 4000;
