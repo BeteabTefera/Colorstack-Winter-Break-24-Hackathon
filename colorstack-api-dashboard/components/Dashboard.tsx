@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HeartHandshake } from 'lucide-react';
+import Nav from '../components/Nav';
+
 
 type Student = {
   id: string;
@@ -72,9 +73,10 @@ const Dashboard: React.FC = () => {
 
   const indexOfLastStudent = currentPage * studentsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = students.slice(indexOfFirstStudent, indexOfLastStudent);
+  //const currentStudents = students.slice(indexOfFirstStudent, indexOfLastStudent);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  
   //function for filtering
   const filteredStudents = students.filter((student) => {
     const nameMatch = (student.first_name + ' ' + student.last_name).toLowerCase().includes(searchTerm.toLowerCase());
@@ -85,33 +87,19 @@ const Dashboard: React.FC = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-500 to-purple-600">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-500 to-sage-600">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <img className="h-8 w-auto" src=".assets/logo.png" alt="ColorStack" />
-              </div>
-              <div className="hidden md:ml-6 md:flex md:space-x-8">
-                <Link href="/dashboard" className="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Dashboard
-                </Link>
-                <Link href="/slack-wrapped-demo" className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Slack Wrapped
-                </Link>
-                <Link href="/study-buddy-demo" className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  Study Buddy
-                </Link>
-                <Link href="/api-docs" className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                  API Docs
-                </Link>
+              <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:spacx-e-8">
+                <Nav />
               </div>
             </div>
             <div className="hidden md:ml-6 md:flex md:items-center">
               <button
                 onClick={handleSignOut}
-                className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 "
               >
                 Sign out
               </button>
@@ -120,11 +108,11 @@ const Dashboard: React.FC = () => {
         </div>
       </nav>
   
-      <div className="flex-grow flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+      <div className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl space-y-8">
-          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-              {currentUser?.first_name}, Welcome to Your Dashboard <HeartHandshake className="ml-2" />
+          <div className="bg-white p-8 rounded-lg shadow-md">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+              {currentUser?.first_name}, Welcome to Your Dashboard <HeartHandshake className="ml-2 text-teal-600" />
             </h1>
             
             <div className="mb-8">
