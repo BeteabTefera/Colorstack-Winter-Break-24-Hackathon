@@ -5,11 +5,14 @@ Welcome to the **Colorstack-API** repository!
 This project was created for the **Colorstack Winter-Break Hackathon**. The goal of this project is simple. Lets break it down
 
 # Problem
-- 90% of Color Stack Members are CS & SWE Students. And the best way to be a better engineer is to do projects!
-- ColorStack has oyster but issues are being limited, so we made a colorstack-api tht we hope it sits on top of the Oyster application. As of right now we are using Supabase to simulate for the hackathon. But this idea has a big potential!
+- 90% of ColorStack Members are CS & SWE Students, and the best way to grow as engineers is by building projects!
+- While ColorStack already has Oyster, its functionality is somewhat limited. To address this, we developed Colorstack-API, designed to sit on top of the Oyster platform. For this hackathon, we are using Supabase to simulate the API backend. This idea, however, has the potential to grow far beyond its current scope!
 
 # Solution
-- We created **[Colorstack-API](https://apiurlcolorstack.vercel.app/)** and **Colorstack-API-Dashboard** 🥳
+- We created **[Colorstack-API](https://apiurlcolorstack.vercel.app/)** and **Colorstack-API-Dashboard** (Having issues deploying right now but look at the UI below ) 🥳
+- These tools empower ColorStack members to build applications specifically tailored for the ColorStack community.
+- This initiative fosters greater inclusivity and involvement, encouraging members to innovate and contribute meaningfully to the community.
+- our slogan is _**For stackers by Stackers!**_
 
 # Overview
 ## Description of the ColorStack API
