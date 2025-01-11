@@ -22,5 +22,14 @@ bun start
 Open [http://localhost:4000](http://localhost:4000) with your browser to test end points.
 
 # Data-endpoints so far:
-- /members - will get you all the current student's information to use for your application
-- /members/:id - Will get you unique student information from Colorstack 
+- GET /members - will get you all the current student's information to use for your application
+- GET /members/:id - Will get you unique student information from Colorstack 
+- GET /slack-channels: Fetches all channels from the slack_channels table.
+- GET /slack-channels/:id: Fetches a specific channel by its ID.
+- GET /slack-messages: Fetches all messages from the slack_messages table.
+- GET /slack-messages/:student_id: Fetches a specific message by its ID.
+- GET /slack-reactions: Fetches all reactions from the slack_reactions table.
+- GET /slack-reactions/:student_id: Fetches a specific reaction by its ID.
+
+# More To COME 🥳
+- If integrated. Oyster DB has 58 tables that can be utilized for colorstack members to make applications off off!
