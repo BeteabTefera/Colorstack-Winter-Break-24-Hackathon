@@ -9,7 +9,7 @@ This project was created for the **Colorstack Winter-Break Hackathon**. The goal
 - While ColorStack already has Oyster, its functionality is somewhat limited. To address this, we developed Colorstack-API, designed to sit on top of the Oyster platform. For this hackathon, we are using Supabase to simulate the API backend. This idea, however, has the potential to grow far beyond its current scope!
 
 # Solution
-- We created **[Colorstack-API](https://apiurlcolorstack.vercel.app/)** and **Colorstack-API-Dashboard** (Having issues deploying right now but look at the UI below ) 🥳
+- We created **[Colorstack-API](https://apiurlcolorstack.vercel.app/)** and **[Colorstack-API-Dashboard](https://api-dashboard-ten.vercel.app/)** 
 - These tools empower ColorStack members to build applications specifically tailored for the ColorStack community.
 - This initiative fosters greater inclusivity and involvement, encouraging members to innovate and contribute meaningfully to the community.
 - our slogan is _**For stackers by Stackers!**_
