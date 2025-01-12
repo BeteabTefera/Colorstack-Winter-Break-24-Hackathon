@@ -5,14 +5,6 @@ import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-if (!supabaseUrl || !supabaseKey || !apiUrl) {
-  throw new Error("Missing environment variables.");
-}
-
 const supabase = createClientComponentClient()
 
 interface Student {
@@ -43,8 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    let mounted = true;
-
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -53,7 +43,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(session.user);
             try {
               await fetchStudentData(session.user.email!);
-              router.push('/dashboard');
             } catch (error) {
               console.error('Error fetching student data:', error);
             }
@@ -67,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      let mounted = true;
       if (!mounted) return;
 
       if (event === 'SIGNED_IN') {
@@ -74,7 +64,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user?.email) {
           try {
             await fetchStudentData(session.user.email);
-            router.push('/dashboard');
           } catch (error) {
             console.error('Error fetching student data:', error);
           }
@@ -84,12 +73,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStudentData(null);
         router.push('/');
       }
+      return () => {
+        mounted = false;
+      };
     });
 
     checkSession();
 
     return () => {
-      mounted = false;
       authListener.subscription.unsubscribe();
     };
   }, [router]);
@@ -131,15 +122,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string): Promise<void> => {
-    const redirectURL = typeof window !== 'undefined' 
-      ? `${window.location.origin}/dashboard`
-      : '/dashboard';
-
     const { error } = await supabase.auth.signInWithOtp({ 
       email,
       options: {
-        emailRedirectTo: redirectURL,
-        data: { email }
+        emailRedirectTo: `${window.location.origin}/dashboard`,
       }
     });
     if (error) throw error;
@@ -154,6 +140,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchStudentData = async (email: string): Promise<Student> => {
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) throw new Error('API URL is not defined');
+      
       const response = await fetch(`${apiUrl}/members/${email}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
