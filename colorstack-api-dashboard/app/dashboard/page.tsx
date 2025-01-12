@@ -1,12 +1,12 @@
-import PrivateRoute from '@/components/PrivateRoute'
-import Dashboard from '../../components/Dashboard';
+import Dashboard from '@/components/Dashboard'
 
 export default function DashboardPage() {
-  return (
-    <PrivateRoute>
-      <div>
-        <Dashboard />
-      </div>
-    </PrivateRoute>
-  )
+  return <Dashboard />
 }
+
+export async function getStaticProps() {
+  return {
+    props: {},
+  }
+}
+
