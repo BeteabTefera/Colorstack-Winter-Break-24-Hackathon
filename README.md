@@ -11,7 +11,7 @@ This project was created for the **Colorstack Winter-Break Hackathon**. The goal
 # Solution
 - We created **[Colorstack-API](https://apiurlcolorstack.vercel.app/)** and **[Colorstack-API-Dashboard](https://api-dashboard-ten.vercel.app/)** 
 - These tools empower ColorStack members to build applications specifically tailored for the ColorStack community.
-- This initiative fosters greater inclusivity and involvement, encouraging members to innovate and contribute meaningfully to the community.
+- This initiative fosters greater inclusivity and involvement, encouraging members to innovate and contribute meaningfully to the community through project-based learning.
 - our slogan is _**For stackers by Stackers!**_
 # Demo
  ![Colorstack-API Demo](https://github.com/BeteabTefera/Winter-Break-24-Hackathon/blob/main/colorstack-api-dashboard/public/assets/demo.gif?raw=true)
