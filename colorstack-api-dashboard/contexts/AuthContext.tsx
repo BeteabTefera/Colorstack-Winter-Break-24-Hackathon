@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+if (!supabaseUrl || !supabaseKey || !apiUrl) {
+  throw new Error("Missing environment variables.");
+}
+
 const supabase = createClientComponentClient()
 
 interface Student {
@@ -28,45 +36,36 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    let mounted = true;
-
     const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
-        
-        if (session) {
-          setUser(session.user);
-          try {
-            await fetchStudentData(session.user.email!);
-          } catch (error) {
-            console.error('Error fetching student data:', error);
-          }
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("Current session:", session);
+      if (session) {
+        setUser(session.user);
+        try {
+          await fetchStudentData(session.user.email!);
+          router.push('/dashboard');
+        } catch (error) {
+          console.error('Error fetching student data:', error);
         }
-        setLoading(false);
-      } catch (error) {
-        console.error('Session check error:', error);
-        if (mounted) setLoading(false);
       }
+      setLoading(false);
     };
 
-    checkSession();
-
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
-
+      console.log('Auth state changed:', event, session?.user?.email);
       if (event === 'SIGNED_IN') {
         setUser(session?.user || null);
         if (session?.user?.email) {
           try {
             await fetchStudentData(session.user.email);
+            router.push('/dashboard');
           } catch (error) {
             console.error('Error fetching student data:', error);
           }
@@ -78,8 +77,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
+    checkSession();
+
     return () => {
-      mounted = false;
       authListener.subscription.unsubscribe();
     };
   }, [router]);
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAndActivateUser = async (email: string): Promise<boolean> => {
     const { data: studentData, error: studentError } = await supabase
       .from('students')
-      .select('email')
+      .select('email, first_name, last_name')
       .eq('email', email)
       .single();
 
@@ -117,36 +117,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error('Error activating account');
     }
 
+    //update the 'students' table with the timestamp of activation
+    const { error: updateError } = await supabase
+      .from('students')
+      .update({ activated_at: new Date() })
+      .eq('email', email);
+    if (updateError) {
+      throw new Error('Error updating student data');
+    }
+
+    //insert the api_usage table with the student's email, fistname, lastname once activated.
+    const { error: insertUsageError } = await supabase
+      .from('api_usage')
+      .insert({ email, first_name: studentData.first_name, last_name: studentData.last_name });
+    if (insertUsageError) {
+      throw new Error('Error inserting student data');
+    }
     return true;
   };
-
   const signIn = async (email: string): Promise<void> => {
-    const response = await fetch('/api/auth', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message);
+    // Check if the user is activated in the students table
+    const { data: studentData, error: studentError } = await supabase
+      .from('students')
+      .select('activated_at')
+      .eq('email', email)
+      .single();
+  
+    if (studentError) {
+      throw new Error('Error checking student activation status');
     }
+  
+    if (!studentData || studentData.activated_at === null) {
+      throw new Error('Account not activated. Please activate your account first.');
+    }
+  
+    // Proceed with sign-in if the account is activated
+    const { error } = await supabase.auth.signInWithOtp({ 
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+        data: {
+          email
+        }
+      }
+    });
+  
+    if (error) throw error;
   };
-
+  
   const signOut = async (): Promise<void> => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+    }
     setUser(null);
     setStudentData(null);
     router.push('/');
   };
-
+  
   const fetchStudentData = async (email: string): Promise<Student> => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) throw new Error('API URL is not defined');
-      
       const response = await fetch(`${apiUrl}/members/${email}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -159,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
-
+  
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -174,13 +204,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === null) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
-

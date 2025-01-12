@@ -7,7 +7,7 @@ const Nav: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <div className="hidden md:ml-6 md:flex md:space-x-8">
+    <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-screen-lg md:ml-6 md:flex md:space-x-8">
       <div className="flex-shrink-0 flex items-center">
         <img className="h-8 w-auto" src="./assets/logo.png" alt="ColorStack" />
       </div>

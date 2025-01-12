@@ -1,5 +1,22 @@
+'use client'
+import { useEffect, useState } from 'react'
 import { AuthProvider } from '@/contexts/AuthContext'
-import "./globals.css"
+import "./globals.css";
+
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  if (!hasMounted) {
+    return null
+  }
+
+  return <>{children}</>
+}
+
 
 export default function RootLayout({
   children,
@@ -8,12 +25,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </body>
+      <ClientOnly>
+        <body>
+          <AuthProvider>{children}</AuthProvider>
+        </body>
+      </ClientOnly>
     </html>
   )
 }
-

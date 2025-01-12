@@ -1,16 +1,17 @@
-'use client' 
+"use client";
 import React, { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { HeartHandshake } from 'lucide-react';
-import Nav from './Nav';
+import Nav from '../components/Nav';
+
 
 type Student = {
   id: string;
   email: string;
   first_name: string;
   last_name: string;
-  activated_at: string | null;
+  activated_at: boolean;
 };
 
 type ApiUsage = {
@@ -24,11 +25,10 @@ const Dashboard: React.FC = () => {
   const [apiUsage, setApiUsage] = useState<ApiUsage | null>(null);
   const [currentUser, setCurrentUser] = useState<Student | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
   const studentsPerPage = 10;
   const router = useRouter();
 
+  // Memoizing the functions using useCallback
   const fetchCurrentUser = useCallback(async () => {
     if (user?.email) {
       const { data, error } = await supabase
@@ -50,15 +50,13 @@ const Dashboard: React.FC = () => {
   }, [supabase]);
 
   const fetchApiUsage = useCallback(async () => {
-    if (user?.email) {
-      const { data, error } = await supabase
-        .from('api_usage')
-        .select('email, total_requests, last_request_at')
-        .eq('email', user.email)
-        .single();
-      if (error) console.error('Error fetching API usage:', error);
-      else setApiUsage(data);
-    }
+    const { data, error } = await supabase
+      .from('api_usage')
+      .select('email, total_requests, last_request_at')
+      .eq('email', user?.email)
+      .single();
+    if (error) console.error('Error fetching API usage:', error);
+    else setApiUsage(data);
   }, [user?.email, supabase]);
 
   useEffect(() => {
@@ -74,20 +72,24 @@ const Dashboard: React.FC = () => {
     router.push('/');
   };
 
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  //const currentStudents = students.slice(indexOfFirstStudent, indexOfLastStudent);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  
+  //function for filtering
   const filteredStudents = students.filter((student) => {
     const nameMatch = (student.first_name + ' ' + student.last_name).toLowerCase().includes(searchTerm.toLowerCase());
     const statusMatch = filterStatus === 'all' || (filterStatus === 'activated' && student.activated_at) || (filterStatus === 'not-activated' && !student.activated_at);
     return nameMatch && statusMatch;
   });
-
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
-
+  
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-500 to-sage-600">
+    //className="container mx-auto px-4 sm:px-6 md:px-8 max-w-screen-lg"
+    <div className=" min-h-screen flex flex-col bg-gradient-to-br from-teal-500 to-sage-600">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -112,7 +114,7 @@ const Dashboard: React.FC = () => {
         <div className="w-full max-w-4xl space-y-8">
           <div className="bg-white p-8 rounded-lg shadow-md">
             <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-              {currentUser?.first_name || 'Welcome'}, Welcome to Your Dashboard <HeartHandshake className="ml-2 text-teal-600" />
+              {currentUser?.first_name}, Welcome to Your Dashboard <HeartHandshake className="ml-2 text-teal-600" />
             </h1>
             
             <div className="mb-8">
@@ -175,8 +177,9 @@ const Dashboard: React.FC = () => {
                           </td>
                         </tr>
                       )}
-                      {currentStudents
+                      {filteredStudents
                         .filter(student => student.id !== currentUser?.id)
+                        .slice(indexOfFirstStudent, indexOfLastStudent)
                         .map((student) => (
                           <tr key={student.id}>
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
@@ -213,7 +216,7 @@ const Dashboard: React.FC = () => {
       </div>
     </div>
   );
+  
 };
 
 export default Dashboard;
-
