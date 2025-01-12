@@ -35,27 +35,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    let mounted = true; // Properly declare mounted variable
+    let mounted = true;
 
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (mounted) {
-          if (session) {
-            setUser(session.user);
-            try {
-              await fetchStudentData(session.user.email!);
-            } catch (error) {
-              console.error('Error fetching student data:', error);
-            }
+        if (!mounted) return;
+        
+        if (session) {
+          setUser(session.user);
+          try {
+            await fetchStudentData(session.user.email!);
+          } catch (error) {
+            console.error('Error fetching student data:', error);
           }
-          setLoading(false);
         }
+        setLoading(false);
       } catch (error) {
         console.error('Session check error:', error);
         if (mounted) setLoading(false);
       }
     };
+
+    checkSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
@@ -75,8 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         router.push('/');
       }
     });
-
-    checkSession();
 
     return () => {
       mounted = false;
@@ -121,13 +121,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string): Promise<void> => {
-    const { error } = await supabase.auth.signInWithOtp({ 
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      }
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
     });
-    if (error) throw error;
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
   };
 
   const signOut = async (): Promise<void> => {
