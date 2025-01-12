@@ -35,6 +35,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    let mounted = true; // Properly declare mounted variable
+
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -56,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      let mounted = true;
       if (!mounted) return;
 
       if (event === 'SIGNED_IN') {
@@ -73,14 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStudentData(null);
         router.push('/');
       }
-      return () => {
-        mounted = false;
-      };
     });
 
     checkSession();
 
     return () => {
+      mounted = false;
       authListener.subscription.unsubscribe();
     };
   }, [router]);
