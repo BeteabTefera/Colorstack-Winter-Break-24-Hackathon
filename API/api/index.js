@@ -20,7 +20,7 @@ app.get('/members', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('students') // Replace with your table name
-            .select('*');
+            .select('id, first_name, last_name, email, activated_at, graduation_date, linked_in_url, major,github_url,personal_website_url,points');
         if (error) throw error;
         res.json(data);
     } catch (err) {
