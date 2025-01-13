@@ -14,7 +14,7 @@ This project was created for the **Colorstack Winter-Break Hackathon**. The goal
 - This initiative fosters greater inclusivity and involvement, encouraging members to innovate and contribute meaningfully to the community through project-based learning.
 - our slogan is _**For stackers by Stackers!**_
 # Demo
- ![Colorstack-API Demo](https://github.com/BeteabTefera/Winter-Break-24-Hackathon/blob/main/colorstack-api-dashboard/public/assets/demo.gif?raw=true)
+ ![Colorstack-API Demo](colorstack-api-dashboard/public/assets/demo.gif)
 
 # Overview
 ## Description of the ColorStack API
