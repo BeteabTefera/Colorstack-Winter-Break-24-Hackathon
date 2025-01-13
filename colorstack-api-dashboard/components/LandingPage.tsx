@@ -55,7 +55,7 @@ const LandingPage: React.FC = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <Image src="/assets/logo.png" alt="ColorStack" width={200} height={200} />
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">API Dashboard</h2>
-        <p className="text-center text-gray-600 mb-8">Enter your ColorStack email to activate or sign in</p>
+        <p className="text-center text-gray-600 mb-8">Enter your email on Slack to activate or sign in</p>
         <form className="space-y-6">
           <input
             type="email"
