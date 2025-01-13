@@ -1,9 +1,17 @@
-'use client' 
+'use client'
+
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Nav from '../components/Nav';
 import { Book, Lock, Server, Shield } from 'lucide-react';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const ApiDocs: React.FC = () => {
   const { signOut } = useAuth();
@@ -13,6 +21,41 @@ const ApiDocs: React.FC = () => {
     await signOut();
     router.push('/');
   };
+
+  const endpointSections = [
+    {
+      title: "Members",
+      bgColor: "bg-teal-50",
+      endpoints: [
+        { method: "GET", path: "/members", description: "Retrieve all current student's information." },
+        { method: "GET", path: "/members/:id", description: "Retrieve unique student information by ID." },
+      ],
+    },
+    {
+      title: "Slack Channels",
+      bgColor: "bg-sage-50",
+      endpoints: [
+        { method: "GET", path: "/slack-channels", description: "Retrieve all Slack channels." },
+        { method: "GET", path: "/slack-channels/:id", description: "Retrieve a specific Slack channel by ID." },
+      ],
+    },
+    {
+      title: "Slack Messages",
+      bgColor: "bg-teal-50",
+      endpoints: [
+        { method: "GET", path: "/slack-messages", description: "Retrieve all messages from Slack." },
+        { method: "GET", path: "/slack-messages/:student_id", description: "Retrieve a specific message by student ID." },
+      ],
+    },
+    {
+      title: "Slack Reactions",
+      bgColor: "bg-sage-50",
+      endpoints: [
+        { method: "GET", path: "/slack-reactions", description: "Retrieve all reactions from Slack." },
+        { method: "GET", path: "/slack-reactions/:student_id", description: "Retrieve a specific reaction by student ID." },
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-500 to-sage-600">
@@ -67,23 +110,25 @@ const ApiDocs: React.FC = () => {
                 <h2 className="text-2xl font-semibold text-gray-800">Endpoints</h2>
               </div>
               
-              <div className="mt-4 bg-teal-50 p-4 rounded-md">
-                <h3 className="text-xl font-medium text-gray-800 mb-2">Dashboard</h3>
-                <p className="text-gray-600 mb-2 font-semibold">GET /dashboard</p>
-                <p className="text-gray-600">Retrieve user information and API usage statistics.</p>
-              </div>
-
-              <div className="mt-4 bg-sage-50 p-4 rounded-md">
-                <h3 className="text-xl font-medium text-gray-800 mb-2">Slack Wrapped</h3>
-                <p className="text-gray-600 mb-2 font-semibold">GET /slack-wrapped</p>
-                <p className="text-gray-600">Retrieve Slack usage statistics for the authenticated user.</p>
-              </div>
-
-              <div className="mt-4 bg-teal-50 p-4 rounded-md">
-                <h3 className="text-xl font-medium text-gray-800 mb-2">Study Buddy</h3>
-                <p className="text-gray-600 mb-2 font-semibold">GET /study-buddy/matches</p>
-                <p className="text-gray-600">Find potential study partners based on shared courses.</p>
-              </div>
+              <Carousel className="w-full max-w-xs mx-auto">
+                <CarouselContent>
+                  {endpointSections.map((section, index) => (
+                    <CarouselItem key={index}>
+                      <div className={`p-4 rounded-md ${section.bgColor}`}>
+                        <h3 className="text-xl font-medium text-gray-800 mb-2">{section.title}</h3>
+                        {section.endpoints.map((endpoint, endpointIndex) => (
+                          <div key={endpointIndex} className="mb-4">
+                            <p className="text-gray-600 mb-2 font-semibold">{endpoint.method} {endpoint.path}</p>
+                            <p className="text-gray-600">{endpoint.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </section>
 
             <section>
@@ -110,3 +155,4 @@ const ApiDocs: React.FC = () => {
 };
 
 export default ApiDocs;
+

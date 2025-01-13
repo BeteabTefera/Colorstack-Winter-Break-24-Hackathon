@@ -144,7 +144,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div>
-              <h2 className="pb-2 text-xl sm:text-2xl font-semibold text-gray-900 mb-3">Students</h2>
+              <h2 className="pb-2 text-xl sm:text-2xl font-semibold text-gray-900 mb-3">Members</h2>
               <div className="overflow-x-auto">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 pb-6">
                   <input
@@ -152,12 +152,12 @@ const Dashboard: React.FC = () => {
                     placeholder="Search by name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full sm:w-auto px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
+                    className="w-full sm:w-auto px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-teal-500"
                   />
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="w-full sm:w-auto px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
+                    className="w-full sm:w-auto px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring focus:ring-teal-500"
                   >
                     <option value="all">All</option>
                     <option value="activated">Activated</option>
