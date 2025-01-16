@@ -6,6 +6,7 @@ import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Popup from '@/components/Popup';
 
+const baseUrl = process.env.NEXT_PUBLIC_URL
 const supabase = createClientComponentClient()
 
 interface Student {
@@ -132,12 +133,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     
-      // Step 6: Use Supabase Auth to sign in with OTP
+      // Step 6: Use Supabase Auth to sign in with OTP, allowing user creation
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          shouldCreateUser: false,
-          emailRedirectTo: `${window.location.origin}/verify`,
+          shouldCreateUser: true, // This allows new users to be created
+          emailRedirectTo: `${baseUrl}/verify`,
         }
       });
     
@@ -146,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     
       // Step 7: Redirect to OTP verification page
-      router.push(`/verify?email=${encodeURIComponent(email)}`);
+      router.push(`${baseUrl}/verify?email=${encodeURIComponent(email)}`);
     } catch (error) {
       console.error('Sign in error:', error);
       if (error instanceof Error) {
@@ -158,9 +159,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setPopupType('error');
         setIsPopupOpen(true);
       }
-      throw error; // Re-throw the error so the LandingPage component knows the sign-in failed
+      throw error;
     }
   };
+  
 
   const verifyOTP = async (email: string, token: string): Promise<void> => {
     try {
@@ -193,9 +195,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) {
       console.error('Error signing out:', error);
     }
+    router.push(`${baseUrl}/`);
     setUser(null);
     setStudentData(null);
-    router.push('/');
   };
   
   const fetchStudentData = async (email: string): Promise<Student> => {
