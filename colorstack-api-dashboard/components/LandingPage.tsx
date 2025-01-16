@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { HandHeart, Github } from 'lucide-react';
@@ -7,46 +8,20 @@ import Image from 'next/image';
 
 const LandingPage: React.FC = () => {
   const [email, setEmail] = useState("");
-  const { signIn, checkAndActivateUser, fetchStudentData } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
 
-  const handleActivation = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    try {
-      await checkAndActivateUser(email);
-      const studentData = await fetchStudentData(email);
-      alert(`Account activated successfully for ${studentData.first_name} ${studentData.last_name}! Check your email for the activation link.`);
-      await signIn(email);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert('An unexpected error occurred. Please try again.');
-      }
-    }
-  };
-  
   const handleSignIn = async (e: React.MouseEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const studentData = await fetchStudentData(email);
-  
-      if (!studentData.activated_at) {
-        alert('Your account is not activated. Please activate your account first.');
-        return;
-      }
-  
       await signIn(email);
-      alert(`Welcome, ${studentData.first_name}! Check your email for the login link.`);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        if (error.message === 'Student not found in Colorstack database') {
-          alert('Sorry, we couldn\'t find your account. Please check your email or contact support.');
-        } else {
-          alert('An error occurred. Please try again later.');
-        }
-      } else {
-        alert('An unexpected error occurred. Please try again.');
-      }
+      alert('OTP sent to your email. Please check your inbox.');
+    } catch (error) {
+      console.error('Sign in error:', error);
+      // The error alert is handled in the signIn function
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,8 +30,8 @@ const LandingPage: React.FC = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <Image src="/assets/logo.png" alt="ColorStack" width={200} height={200} />
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">API Dashboard</h2>
-        <p className="text-center text-gray-600 mb-8">Enter your email on Slack to activate or sign in</p>
-        <form className="space-y-6">
+        <p className="text-center text-gray-600 mb-8">Enter your email to receive an OTP</p>
+        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
           <input
             type="email"
             required
@@ -65,18 +40,13 @@ const LandingPage: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <div className="flex space-x-4">
-            <button
-              onClick={handleActivation}
-              className="w-1/2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-            >
-              Activate
-            </button>
+          <div className="flex justify-center items-center space-x-4">
             <button
               onClick={handleSignIn}
-              className="w-1/2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sage-500"
+              disabled={isLoading}
+              className="w-1/2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sage-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {isLoading ? 'Sending OTP...' : 'Send OTP'}
             </button>
           </div>
         </form>
@@ -93,3 +63,4 @@ const LandingPage: React.FC = () => {
 };
 
 export default LandingPage;
+

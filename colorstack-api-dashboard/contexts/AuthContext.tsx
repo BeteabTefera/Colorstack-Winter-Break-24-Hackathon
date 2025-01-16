@@ -5,14 +5,6 @@ import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-if (!supabaseUrl || !supabaseKey || !apiUrl) {
-  throw new Error("Missing environment variables.");
-}
-
 const supabase = createClientComponentClient()
 
 interface Student {
@@ -26,8 +18,8 @@ interface Student {
 interface AuthContextType {
   user: User | null;
   supabase: typeof supabase;
-  checkAndActivateUser: (email: string) => Promise<boolean>;
   signIn: (email: string) => Promise<void>;
+  verifyOTP: (email: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
   fetchStudentData: (email: string) => Promise<Student>;
@@ -84,85 +76,97 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [router]);
 
-  const checkAndActivateUser = async (email: string): Promise<boolean> => {
-    const { data: studentData, error: studentError } = await supabase
-      .from('students')
-      .select('email, first_name, last_name')
-      .eq('email', email)
-      .single();
-
-    if (studentError || !studentData) {
-      throw new Error('Student not found in Colorstack database');
-    }
-
-    const { data: activatedData, error: activatedError } = await supabase
-      .from('api_activated')
-      .select('email')
-      .eq('email', email)
-      .single();
-
-    if (activatedError && activatedError.code !== 'PGRST116') {
-      throw new Error('Error checking activation status');
-    }
-
-    if (activatedData) {
-      throw new Error('Email already activated');
-    }
-
-    const { error: insertError } = await supabase
-      .from('api_activated')
-      .insert({ email });
-
-    if (insertError) {
-      throw new Error('Error activating account');
-    }
-
-    //update the 'students' table with the timestamp of activation
-    const { error: updateError } = await supabase
-      .from('students')
-      .update({ activated_at: new Date() })
-      .eq('email', email);
-    if (updateError) {
-      throw new Error('Error updating student data');
-    }
-
-    //insert the api_usage table with the student's email, fistname, lastname once activated.
-    const { error: insertUsageError } = await supabase
-      .from('api_usage')
-      .insert({ email, first_name: studentData.first_name, last_name: studentData.last_name });
-    if (insertUsageError) {
-      throw new Error('Error inserting student data');
-    }
-    return true;
-  };
   const signIn = async (email: string): Promise<void> => {
-    // Check if the user is activated in the students table
-    const { data: studentData, error: studentError } = await supabase
-      .from('students')
-      .select('activated_at')
-      .eq('email', email)
-      .single();
-  
-    if (studentError) {
-      throw new Error('Error checking student activation status');
-    }
-  
-    if (!studentData || studentData.activated_at === null) {
-      throw new Error('Account not activated. Please activate your account first.');
-    }
-  
-    // Proceed with sign-in if the account is activated
-    const { error } = await supabase.auth.signInWithOtp({ 
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: {
-          email
+    try {
+      // Step 1: Check if the user exists in the students table
+      const { data: studentData, error: studentError } = await supabase
+        .from('students')
+        .select('email, first_name, last_name, activated_at')
+        .eq('email', email)
+        .single();
+    
+      if (studentError || !studentData) {
+        throw new Error('Student not found in Colorstack database');
+      }
+    
+      // Step 2: Check if the student is new by checking the activated_at field
+      const isNewStudent = !studentData.activated_at;
+      
+      if (isNewStudent) {
+        // Step 3: If the student is new, update activated_at with the current timestamp
+        const { error: updateError } = await supabase
+          .from('students')
+          .update({ activated_at: new Date().toISOString() })
+          .eq('email', email);
+    
+        if (updateError) {
+          throw new Error('Error updating student data');
+        }
+    
+        // Step 4: Insert the student email into the api_activated table
+        const { error: insertActivatedError } = await supabase
+          .from('api_activated')
+          .insert([{ email }]);
+    
+        if (insertActivatedError) {
+          throw new Error('Error inserting into api_activated table');
+        }
+    
+        // Step 5: Insert the student data into the api_usage table
+        const { error: insertUsageError } = await supabase
+          .from('api_usage')
+          .insert([{ email, first_name: studentData.first_name, last_name: studentData.last_name }]);
+    
+        if (insertUsageError) {
+          throw new Error('Error inserting into api_usage table');
         }
       }
-    });
-  
-    if (error) throw error;
+    
+      // Step 6: Use Supabase Auth to sign in with OTP
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/verify`,
+        }
+      });
+    
+      if (authError) {
+        throw authError;
+      }
+    
+      // Step 7: Redirect to OTP verification page
+      router.push(`/verify?email=${encodeURIComponent(email)}`);
+    } catch (error) {
+      console.error('Sign in error:', error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('An unexpected error occurred. Please try again.');
+      }
+    }
+  };
+
+  const verifyOTP = async (email: string, token: string): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'email'
+      });
+
+      if (error) throw error;
+
+      // If successful, the user will be automatically signed in
+      // and the onAuthStateChange listener will handle the redirection
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('An unexpected error occurred. Please try again.');
+      }
+    }
   };
   
   const signOut = async (): Promise<void> => {
@@ -177,11 +181,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const fetchStudentData = async (email: string): Promise<Student> => {
     try {
-      const response = await fetch(`${apiUrl}/members/${email}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('Student not found');
+
       setStudentData(data);
       return data;
     } catch (error) {
@@ -195,8 +203,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user, 
       loading, 
       supabase, 
-      checkAndActivateUser, 
       signIn, 
+      verifyOTP,
       signOut, 
       fetchStudentData, 
       studentData 
@@ -213,3 +221,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

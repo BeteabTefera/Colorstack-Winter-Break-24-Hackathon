@@ -18,13 +18,21 @@ export async function middleware(req: NextRequest) {
     '/study-buddy-demo'
   ];
 
+  // Public routes
+  const publicPaths = ['/', '/verify'];
+
   // Check if the current path is protected
   const isProtectedPath = protectedPaths.some(path => 
     req.nextUrl.pathname.startsWith(path)
   );
 
+  // Check if the current path is public
+  const isPublicPath = publicPaths.some(path => 
+    req.nextUrl.pathname === path
+  );
+
   // If there's no session and the user is trying to access a protected route
-  if (!session && isProtectedPath) {
+  if (!session && isProtectedPath && !isPublicPath) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = '/';
     return NextResponse.redirect(redirectUrl);
@@ -35,6 +43,8 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
+    '/verify',
     '/dashboard/:path*',
     '/api-docs/:path*',
     '/slack-wrapped-demo/:path*',
