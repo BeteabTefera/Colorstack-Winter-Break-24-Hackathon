@@ -5,21 +5,29 @@ import { useAuth } from "../contexts/AuthContext";
 import { HandHeart, Github } from 'lucide-react';
 import Link from "next/link";
 import Image from 'next/image';
+import Popup from './Popup';
 
 const LandingPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<'success' | 'error'>('success');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleSignIn = async (e: React.MouseEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       await signIn(email);
-      alert('OTP sent to your email. Please check your inbox.');
+      setPopupMessage('OTP sent to your email. Please check your inbox.');
+      setPopupType('success');
+      setIsPopupOpen(true);
     } catch (error) {
       console.error('Sign in error:', error);
-      // The error alert is handled in the signIn function
+      setPopupMessage('An error occurred. Please try again.');
+      setPopupType('error');
+      setIsPopupOpen(true);
     } finally {
       setIsLoading(false);
     }
@@ -58,6 +66,12 @@ const LandingPage: React.FC = () => {
         </div>
         <p className="mt-4 text-center text-gray-600">By Stackers for Stackers</p>
       </div>
+      <Popup
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </div>
   );
 };

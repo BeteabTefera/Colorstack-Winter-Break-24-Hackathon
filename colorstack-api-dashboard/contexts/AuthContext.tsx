@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Popup from '@/components/Popup';
 
 const supabase = createClientComponentClient()
 
@@ -24,6 +25,12 @@ interface AuthContextType {
   loading: boolean;
   fetchStudentData: (email: string) => Promise<Student>;
   studentData: Student | null;
+  popupMessage: string;
+  setPopupMessage: React.Dispatch<React.SetStateAction<string>>;
+  popupType: 'success' | 'error';
+  setPopupType: React.Dispatch<React.SetStateAction<'success' | 'error'>>;
+  isPopupOpen: boolean;
+  setIsPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,6 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState<'success' | 'error'>('success');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -140,10 +150,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Sign in error:', error);
       if (error instanceof Error) {
-        alert(error.message);
+        setPopupMessage(error.message);
+        setPopupType('error');
+        setIsPopupOpen(true);
       } else {
-        alert('An unexpected error occurred. Please try again.');
+        setPopupMessage('An unexpected error occurred. Please try again.');
+        setPopupType('error');
+        setIsPopupOpen(true);
       }
+      throw error; // Re-throw the error so the LandingPage component knows the sign-in failed
     }
   };
 
@@ -162,9 +177,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('OTP verification error:', error);
       if (error instanceof Error) {
-        alert(error.message);
+        setPopupMessage(error.message);
+        setPopupType('error');
+        setIsPopupOpen(true);
       } else {
-        alert('An unexpected error occurred. Please try again.');
+        setPopupMessage('An unexpected error occurred. Please try again.');
+        setPopupType('error');
+        setIsPopupOpen(true);
       }
     }
   };
@@ -207,9 +226,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       verifyOTP,
       signOut, 
       fetchStudentData, 
-      studentData 
+      studentData,
+      popupMessage,
+      setPopupMessage,
+      popupType,
+      setPopupType,
+      isPopupOpen,
+      setIsPopupOpen
     }}>
       {children}
+      <Popup
+        message={popupMessage}
+        type={popupType}
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+      />
     </AuthContext.Provider>
   );
 };
