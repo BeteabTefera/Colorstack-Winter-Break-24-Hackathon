@@ -6,7 +6,6 @@ import { User } from '@supabase/supabase-js';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Popup from '@/components/Popup';
 
-const baseUrl = process.env.NEXT_PUBLIC_URL
 const supabase = createClientComponentClient()
 
 interface Student {
@@ -195,7 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) {
       console.error('Error signing out:', error);
     }
-    router.push(`/`);
+    router.push('/');
     setUser(null);
     setStudentData(null);
   };
