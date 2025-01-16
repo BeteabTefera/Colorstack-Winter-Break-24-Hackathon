@@ -138,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         options: {
           shouldCreateUser: true, // This allows new users to be created
-          emailRedirectTo: `${baseUrl}/verify`,
+          emailRedirectTo: `/verify`,
         }
       });
     
@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     
       // Step 7: Redirect to OTP verification page
-      router.push(`${baseUrl}/verify?email=${encodeURIComponent(email)}`);
+      router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (error) {
       console.error('Sign in error:', error);
       if (error instanceof Error) {
@@ -195,7 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) {
       console.error('Error signing out:', error);
     }
-    router.push(`${baseUrl}/`);
+    router.push(`/`);
     setUser(null);
     setStudentData(null);
   };
